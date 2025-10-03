@@ -1,17 +1,26 @@
 import Navbar from '@/components/Navbar'
 import { cookies } from 'next/headers'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+function getCookieHeader(): string | undefined {
+  const all = cookies().getAll()
+  if (!all.length) return undefined
+  return all.map(c => `${c.name}=${c.value}`).join('; ')
+}
+
 async function getPending() {
-  const cookieHeader = cookies().toString()
-  const res = await fetch(`/api/admin/pending`, { cache: 'no-store', headers: { cookie: cookieHeader } })
+  const cookieHeader = getCookieHeader()
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/admin/pending`, { cache: 'no-store', headers: cookieHeader ? { cookie: cookieHeader } : {} })
   if (res.status === 401) return { unauthorized: true }
   if (!res.ok) return { items: [] }
   return res.json()
 }
 
 async function getLive() {
-  const cookieHeader = cookies().toString()
-  const res = await fetch(`/api/admin/live`, { cache: 'no-store', headers: { cookie: cookieHeader } })
+  const cookieHeader = getCookieHeader()
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/admin/live`, { cache: 'no-store', headers: cookieHeader ? { cookie: cookieHeader } : {} })
   if (res.status === 401) return { unauthorized: true }
   if (!res.ok) return { items: [] }
   return res.json()
@@ -19,8 +28,8 @@ async function getLive() {
 
 async function act(path: string) {
   'use server'
-  const cookieHeader = cookies().toString()
-  await fetch(path, { method: 'POST', headers: { cookie: cookieHeader } })
+  const cookieHeader = getCookieHeader()
+  await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}${path}`, { method: 'POST', headers: cookieHeader ? { cookie: cookieHeader } : {} })
 }
 
 export default async function AdminDashboard() {
