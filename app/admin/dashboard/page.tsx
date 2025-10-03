@@ -1,20 +1,26 @@
 import Navbar from '@/components/Navbar'
+import { cookies } from 'next/headers'
 
 async function getPending() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/admin/pending`, { cache: 'no-store' })
+  const cookieHeader = cookies().toString()
+  const res = await fetch(`/api/admin/pending`, { cache: 'no-store', headers: { cookie: cookieHeader } })
+  if (res.status === 401) return { unauthorized: true }
   if (!res.ok) return { items: [] }
   return res.json()
 }
 
 async function getLive() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/admin/live`, { cache: 'no-store' })
+  const cookieHeader = cookies().toString()
+  const res = await fetch(`/api/admin/live`, { cache: 'no-store', headers: { cookie: cookieHeader } })
+  if (res.status === 401) return { unauthorized: true }
   if (!res.ok) return { items: [] }
   return res.json()
 }
 
 async function act(path: string) {
   'use server'
-  await fetch(path, { method: 'POST' })
+  const cookieHeader = cookies().toString()
+  await fetch(path, { method: 'POST', headers: { cookie: cookieHeader } })
 }
 
 export default async function AdminDashboard() {
@@ -23,6 +29,11 @@ export default async function AdminDashboard() {
     <main>
       <Navbar />
       <div className="mx-auto max-w-4xl p-4 grid gap-6 md:grid-cols-2">
+        {(pending as any)?.unauthorized || (live as any)?.unauthorized ? (
+          <div className="md:col-span-2 rounded border p-3">
+            <p className="text-sm">You must be logged in as admin. Please go to <a className="underline" href="/admin/login">/admin/login</a> and sign in.</p>
+          </div>
+        ) : null}
         <section>
           <h2 className="font-semibold">Pending</h2>
           <ul className="mt-2 space-y-3">
