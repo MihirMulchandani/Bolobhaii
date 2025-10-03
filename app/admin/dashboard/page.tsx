@@ -1,4 +1,4 @@
-import Navbar from '@/app/components/Navbar'
+import Navbar from '@/components/Navbar'
 
 async function getPending() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/admin/pending`, { cache: 'no-store' })

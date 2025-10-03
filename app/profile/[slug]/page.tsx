@@ -1,4 +1,4 @@
-import Navbar from '@/app/components/Navbar'
+import Navbar from '@/components/Navbar'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
 async function getProfile(slug: string) {

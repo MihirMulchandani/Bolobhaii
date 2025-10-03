@@ -1,4 +1,4 @@
-import Navbar from '@/app/components/Navbar'
+import Navbar from '@/components/Navbar'
 
 async function getLeaderboard() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/leaderboard?limit=20`, { cache: 'no-store' })
